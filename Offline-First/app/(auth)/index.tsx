@@ -1,8 +1,10 @@
 import { Text, View, Pressable } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import AuthenticateWithBiometrix from '@/hooks/BiometrixAuth';
 
 export default function AuthScreen() {
+
   return (
     // background-color: #131315
     <SafeAreaView className='bg-vault-black flex-1 items-center p-6 bg-black'>
@@ -12,7 +14,7 @@ export default function AuthScreen() {
       <Text className='text-white text-4xl font-bold tracking-tight'>Secure Access</Text>
 
       <View className='flex flex-row gap-2 items-center border border-emerald-500/20 bg-emerald-500/10 mt-4 p-2 px-4 rounded-full'>
-        <View className='bg-emerald-400 rounded-full w-2 h-2 animate-pulse' />
+        <View className='bg-emerald-400 rounded-full w-2 h-2' />
         <Text className='text-emerald-400 text-xs font-medium uppercase tracking-widest'>System Armed & Encrypted</Text>
       </View>
 
@@ -28,7 +30,11 @@ export default function AuthScreen() {
       <View className='flex-row mt-auto mb-10 gap-5'>
 
         {/* FaceID Card - The "Glass Vault" Style */}
-        <Pressable className='glass-vault flex-1 bg-white/5 border border-white/10 p-6 items-center rounded-3xl shadow-2xl'>
+        <Pressable className='glass-vault flex-1 bg-white/5 border border-white/10 p-6 items-center rounded-3xl shadow-2xl'
+
+          onPress={() => AuthenticateWithBiometrix()}
+
+        >
           <View className="bg-indigo-500/10 p-4 rounded-2xl mb-4">
             <MaterialCommunityIcons name="face-recognition" size={42} color="#818cf8" />
           </View>
