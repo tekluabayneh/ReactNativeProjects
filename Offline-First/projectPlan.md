@@ -36,7 +36,7 @@ Why it's advanced: You'll learn how to manage NetInfo and how to architect a dat
   - Offline-First
   - Debouncing Search
   - Glassmorphism UI
-  - auth with FaceID/Fingerprint
+  - auth with FaceID/Fingerprint // done
   - sync data when network comes/stable
 
 - optional fetures
@@ -55,6 +55,6 @@ Why it's advanced: You'll learn how to manage NetInfo and how to architect a dat
 
   ## map out the system requirment
 
-  - for notes we tends to createt ethe data so we kind have to use json
+  - for notes we tends to create the data so we kind have to use json
   - we should be able to store the data in local SQLite storage and handle sync when data is stable
   - and also offline login is must do (if net is down)
