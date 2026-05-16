@@ -4,9 +4,11 @@ import { BlurView } from 'expo-blur';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import AddNoteModal from '@/components/AddNoteModal';
+import { ManageNonte } from '@/hooks/AddNotes';
 
 export default function TabOneScreen() {
   const [isModalOpen, setIsModalOpen] = useState(false)
+  ManageNonte.CheckNetworkStablity() /// here this function should check for network connectivity 
   return (
     <View className="flex-1 bg-[#0f0f0f]">
       {/* Background Decorative Accents for Blur Depth */}

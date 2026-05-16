@@ -8,6 +8,11 @@
 // within tha class i need add rmeove update delte 
 // when user add or do CRUD opration we have to first check if net is stable if so upload direcly to remote otherwise in local 
 
+import NetInfo from "@react-native-community/netinfo";
+import { useNetInfoInstance, useNetInfo } from "@react-native-community/netinfo";
+const { type, isConnected } = useNetInfo()
+
+
 interface Note {
   title: string,
   note: string,
@@ -32,6 +37,7 @@ class NotesTakingManager {
 
 
   CheckNetworkStablity(): boolean {
+    console.log(isConnected)
     // here we first check if user is offline or offline and if the user is up and running to accept rquest 
     return false
   }
@@ -59,6 +65,6 @@ class NotesTakingManager {
   }
 }
 
-
-// const ManageNonte = new NotesTakingManager
+const note = { tag1: "", tag2: "", title: "", note: "" }
+export const ManageNonte = new NotesTakingManager(note, 1)
 
