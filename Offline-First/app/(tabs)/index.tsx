@@ -9,6 +9,9 @@ import { ManageNonte } from '@/hooks/AddNotes';
 export default function TabOneScreen() {
   const [isModalOpen, setIsModalOpen] = useState(false)
   ManageNonte.CheckNetworkStablity() /// here this function should check for network connectivity 
+  ManageNonte.SyncDataWithoutConflict() /// here this function should check for network connectivity 
+
+
   return (
     <View className="flex-1 bg-[#0f0f0f]">
       {/* Background Decorative Accents for Blur Depth */}
