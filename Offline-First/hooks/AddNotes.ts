@@ -11,7 +11,8 @@
 // import NetInfo from "@react-native-community/netinfo";
 import { fetch } from "@react-native-community/netinfo";
 import * as SQLite from 'expo-sqlite';
-
+import { Alert } from "react-native";
+import axios from "axios"
 
 
 interface Note {
@@ -78,77 +79,93 @@ class NotesTakingManager {
 
   }
 
+  async isRemoteUpAndRunning() {
+    // check if remote server are up and running 
+    const BASEURL = "http://localhost:3001"
+    const res = await fetch(BASEURL)
+    return { res: res, baseUrl: BASEURL }
+  }
 
-  async SyncDataWithoutConflict() {
+  async SyncDataWithoutConflict(Note: Note) {
+    const baseUrl = (await this.isRemoteUpAndRunning()).baseUrl
     try {
-
-      // first check if we have data to sync 
-      // if (local data does not exist sync is available){ 
-      // return 
-      // }
-      if (!this.isConnected || !this.DB) {
-        this.Reason = {
-          "typeOfProblem": "network is not available"
+      const AllLocalData = await this.DB?.getAllAsync(`SELECT * FROM offline_first_note`)
+      if (AllLocalData != undefined && AllLocalData?.length > 0) {
+        for (const note of AllLocalData) {
+          // sync local files form local to remote 
+          const res = await axios.post(`${baseUrl}/posts`, note);
+          if (res.status != 200) {
+            // if fail just upload the current note to local and return 
+            await this.DB?.runAsync(`INSERT INTO NoteTaking(note, title, tag1, tag2) VALUES(${Note.note},${Note.title},${Note.tag1},${Note.tag2}) `)
+            Alert.alert("Fail", "fail syncing fils")
+            break
+          }
+          Alert.alert("Success", "loca files are sync to remove frutfully")
         }
-        return
       }
-
-      // check if remote server is awake and available for request 
-      await fetch("http://localhost:3001")
-        .then(res => {
-          console.log("resof", res)
-        })
-
     } catch (error) {
       console.log(error)
     }
-    // TDDO 
-    // we need way to sync data to remote server and update isSyncAvilable flag if success
-    //
-    // first check if net is working or available 
-    // check if we have data in loca that is not synced 
-    // sync data if avliable if not just return falg 
-    // anc check if remote server is up and runnig before pushing sync 
+  }
 
-    if (!this.isConnected) {
-      // net is not connect so store form local 
-      this.Reason = {
-        "typeOfProblem": "network is not available"
-      }
+  // NOTE 
+  // steps 
+  //  - check if net is available 
+  //    - in case of net is not available i must store the current note to local db
+  //    - and update isSyncAvilable to yes flag
+  //  - check if remote server is up and running 
+  //    - in case of remote server are not running i just have to try again later on as re-try method can help here 
+  //  - check if there is any local files i first need to sync 
+  //    - if not local data are presented i can just skip it
+  //  - sync or upload current note  
+  //    - if any error occur during update or sync we have to have fault tolerance where i need to have re-try or try after some amount of time  like after 10Mins 
+  //  - update or remove local files 
+  //     - if update or sync are success i can safely remove local data 
+  //  - update isSyncAvilable 
+  //  - fault tolerance if any error occur during syncing or uploading note i should taken care of that too  
+  //     - should implement try-catch with best method of fault tolerance and notify user about it briefly
+
+  async AddNote(Note: Note) {
+    if (!Note.title || !Note.note) {
+      Alert.alert("Data inconsistency", "note should contain atlist title and note")
       return
     }
 
-    if (this.isSyncAvilable != "no") {
-      // here sync are avliable so first finishe syncing 
-      // if sync are not 200OK  
-      this.isSyncAvilable = "yes" // still we have to sync data so sync is avliable retry 
+    try {
+      if (!this.isConnected || (await this.isRemoteUpAndRunning()).res.isConnected) {
+        await this.DB?.runAsync(`INSERT INTO NoteTaking(note, title, tag1, tag2) VALUES(${Note.note},${Note.title},${Note.tag1},${Note.tag2}) `)
+        this.isSyncAvilable = "yes"
+        Alert.alert("Success", "note is uploaded in local fils")
+        return
+      }
+
+      if (this.isSyncAvilable && (await this.isRemoteUpAndRunning()).res.isConnected) {
+        const baseUrl = (await this.isRemoteUpAndRunning()).baseUrl
+        // sync local to remote 
+        await this.SyncDataWithoutConflict(Note)
+        // upload current note to remote 
+        const res = await axios.post(`${baseUrl}/posts`, Note);
+        if (res.status != 200) {
+          Alert.alert("Failed", "Failed to upload current note to remote db")
+        }
+        // at the end upload the current note
+        this.isSyncAvilable = "no"
+        Alert.alert("Success", "note is uploaded remot db")
+      }
+
+      // remove any local files 
+      await this.DB?.runAsync("DELETE FROM offline_first_note");
+      this.isSyncAvilable = "no"
+    } catch (error) {
+      console.log(error)
     }
-
-    this.isSyncAvilable = "no"
-
 
   }
 
 
-  // we need way to add Note 
-  async AddNote(Note: Note) {
-    // Note 
-    // first always check if data need to be sync 
-    if (!this.CheckNetworkStablity()) {
-      // net is not connect so store form local 
-      await this.DB?.runAsync(`INSERT INTO NoteTaking(note, title, tag1, tag2) VALUES(${Note.note},${Note.title},${Note.tag1},${Note.tag2}) `)
-    }
-    // before create to local check i remote server is rachable 
-    // if (remote is rechable) {
-    //   // add note to there
-    // }
-
-
-    return "yay it work"
-  }
   UpdateNote(id: number, NoteData: Omit<Note, "tag1" | "tag2">): string {
     // first always check if data need to be sync 
-    /// again here check if remote server are recahble if so update from there and also from lcoal storage  to free from conflict/overide 
+    /// again here check if remote server are reachable if so update from there and also from lcoal storage  to free from conflict/override 
 
     return "update note id 2"
   }
