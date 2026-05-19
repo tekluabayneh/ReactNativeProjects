@@ -45,59 +45,81 @@ class NotesTakingManager {
     this.isSyncAvilable = isSyncAvilable || "yes"
     this.id = id
     this.Reason = Reason || {}
+    // this.InitizeDB()
+    this.CheckNetworkStablity()
   }
 
   async InitizeDB() {
-    this.DB = await SQLite.openDatabaseAsync("offline_first_note")
-
-    // if table does not exist create it 
-    await this.DB.execAsync(` 
+    try {
+      this.DB = await SQLite.openDatabaseAsync("offline_first_note")
+      // if table does not exist create it 
+      await this.DB.execAsync(` 
       CREATE TABLE IF NOT EXISTS NoteTaking (
-      id TEXT PRIMARY KEY NOT NULL,
+      id INTEGER PRIMARY KEY,
       note TEXT,
       title TEXT,
       tag1 TEXT,
       tag2 TEXT
-     `)
-    this.isSyncAvilable = "yes"
+)`)
+      console.log("Database and tables initialized successfully!");
+    } catch (error) {
+      console.log("failed create db and table", error)
+    }
+  }
+
+
+  // first check if there is local files that need to be sync and sync after that pull all the data form remote server
+  async GetAllNote() {
+    if (this.isSyncAvilable == "yes") {
+      this.SyncDataWithoutConflict()
+      this.isSyncAvilable = "no"
+    }
+
+    const res = await this.DB?.getAllAsync("SELECT * FROM NoteTaking")
+    console.log("note", res)
   }
 
 
   async CheckNetworkStablity(): Promise<void> {
     try {
       fetch().then(state => {
-        console.log(state.isConnected)
         this.isConnected = state.isConnected ?? false
         this.netType = state.type
-        console.log(state.type)
       })
     } catch (error) {
-      console.log(error)
-    } finally {
-      console.log("checking net is faling ")
+      console.log("error while checking if phone is connected to network", error)
     }
 
   }
 
   async isRemoteUpAndRunning() {
-    // check if remote server are up and running 
-    const BASEURL = "http://localhost:3001"
-    const res = await fetch(BASEURL)
-    return { res: res, baseUrl: BASEURL }
+    try {
+      // check if remote server are up and running 
+      // const BASEURL = "http://localhost:3001"
+      const BASEURL = "https://6a0c8d2f5aa893e1015c0f4d.mockapi.io"
+      const res = await axios.get(BASEURL)
+      console.log(res.status)
+      return { res: res.status == 200 ? { "isConnected": true } : { "isConnected": false }, baseUrl: BASEURL }
+    } catch (error) {
+      console.log("failed chihng if remote server is up and running", error)
+    }
   }
 
-  async SyncDataWithoutConflict(Note: Note) {
-    const baseUrl = (await this.isRemoteUpAndRunning()).baseUrl
+  async SyncDataWithoutConflict(Note?: Note) {
+    const baseUrl = (await this.isRemoteUpAndRunning())?.baseUrl
     try {
-      const AllLocalData = await this.DB?.getAllAsync(`SELECT * FROM offline_first_note`)
+      const AllLocalData = await this.DB?.getAllAsync(`SELECT * FROM NoteTaking`)
       if (AllLocalData != undefined && AllLocalData?.length > 0) {
         for (const note of AllLocalData) {
+          console.log("notes man", note)
           // sync local files form local to remote 
-          const res = await axios.post(`${baseUrl}/posts`, note);
+          const res = await axios.post(`${baseUrl}/notes`, note);
+          console.log("hrere,", res)
           if (res.status != 200) {
             // if fail just upload the current note to local and return 
-            await this.DB?.runAsync(`INSERT INTO NoteTaking(note, title, tag1, tag2) VALUES(${Note.note},${Note.title},${Note.tag1},${Note.tag2}) `)
-            Alert.alert("Fail", "fail syncing fils")
+            const res = await this.DB?.runAsync(`INSERT INTO NoteTaking(note, title, tag1, tag2) VALUES(?, ?, ?, ?) `, [Note?.note, Note?.title, Note?.tag1, Note?.tag2])
+            console.log(res)
+            Alert.alert("Fail", "failed syncing files")
             break
           }
           Alert.alert("Success", "loca files are sync to remove frutfully")
@@ -132,32 +154,43 @@ class NotesTakingManager {
     }
 
     try {
-      if (!this.isConnected || (await this.isRemoteUpAndRunning()).res.isConnected) {
-        await this.DB?.runAsync(`INSERT INTO NoteTaking(note, title, tag1, tag2) VALUES(${Note.note},${Note.title},${Note.tag1},${Note.tag2}) `)
+      console.log(this.isConnected, (await this.isRemoteUpAndRunning())?.res.isConnected)
+
+
+      if (!this.isConnected || (await this.isRemoteUpAndRunning())?.res.isConnected == false) {
+        const res = await this.DB?.runAsync(`INSERT INTO NoteTaking(note, title, tag1, tag2) VALUES(?, ?, ?, ?) `, [Note.note, Note.title, Note.tag1, Note.tag2])
+        console.log(res)
         this.isSyncAvilable = "yes"
         Alert.alert("Success", "note is uploaded in local fils")
+        console.log("Success", "note is uploaded in local fils")
         return
       }
 
-      if (this.isSyncAvilable && (await this.isRemoteUpAndRunning()).res.isConnected) {
-        const baseUrl = (await this.isRemoteUpAndRunning()).baseUrl
+
+      if (this.isSyncAvilable == "yes" && (await this.isRemoteUpAndRunning())?.res.isConnected) {
+        const baseUrl = (await this.isRemoteUpAndRunning())?.baseUrl
+
+        console.log("uploading to reote .....")
+        console.log(baseUrl)
         // sync local to remote 
-        await this.SyncDataWithoutConflict(Note)
+        // await this.SyncDataWithoutConflict(Note)
         // upload current note to remote 
-        const res = await axios.post(`${baseUrl}/posts`, Note);
+        console.log("note data man", Note)
+        const res = await axios.post(`${baseUrl}/notes`, Note);
+
         if (res.status != 200) {
           Alert.alert("Failed", "Failed to upload current note to remote db")
         }
         // at the end upload the current note
         this.isSyncAvilable = "no"
-        Alert.alert("Success", "note is uploaded remot db")
+        Alert.alert("Success", "note uploaded to remote server.")
       }
 
       // remove any local files 
-      await this.DB?.runAsync("DELETE FROM offline_first_note");
+      // await this.DB?.runAsync("DELETE FROM NoteTaking");
       this.isSyncAvilable = "no"
     } catch (error) {
-      console.log(error)
+      console.log("failed uploading ", error)
     }
 
   }

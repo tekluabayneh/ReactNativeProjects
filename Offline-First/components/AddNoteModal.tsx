@@ -14,7 +14,6 @@ export default function AddNoteModal({ setIsModalOpen }) {
     const not = { title: title, note: note, tag1: tags.tag1, tag2: tags.tag2 }
     ManageNonte.AddNote(not)
   }
-
   return (
     /* Overlay background to make the modal pop */
     <View className="absolute top-32 left-12 bg-black/60 flex-1 justify-center items-center px-5 z-50">
