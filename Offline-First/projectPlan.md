@@ -35,7 +35,7 @@ Why it's advanced: You'll learn how to manage NetInfo and how to architect a dat
 - must have fetures
   - Offline-First
   - Debouncing Search
-  - Glassmorphism UI
+  - Glassmorphism UI // done
   - auth with FaceID/Fingerprint // done
   - sync data when network comes/stable
 

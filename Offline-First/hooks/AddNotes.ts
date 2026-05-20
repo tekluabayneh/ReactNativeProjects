@@ -15,7 +15,7 @@ import { Alert } from "react-native";
 import axios from "axios"
 
 
-interface Note {
+export interface Note {
   title: string,
   note: string,
   tag1: string,
@@ -70,13 +70,22 @@ class NotesTakingManager {
 
   // first check if there is local files that need to be sync and sync after that pull all the data form remote server
   async GetAllNote() {
-    if (this.isSyncAvilable == "yes") {
-      this.SyncDataWithoutConflict()
-      this.isSyncAvilable = "no"
-    }
+    try {
+      if (this.isSyncAvilable == "yes" && this.isConnected && (await this.isRemoteUpAndRunning())?.res.isConnected) {
+        this.SyncDataWithoutConflict()
+      }
 
-    const res = await this.DB?.getAllAsync("SELECT * FROM NoteTaking")
-    console.log("note", res)
+      if (this.isConnected && (await this.isRemoteUpAndRunning())?.res.isConnected) {
+        const { data: notes } = await axios.get((await this.isRemoteUpAndRunning())?.baseUrl! + "/notes")
+        this.isSyncAvilable = "no"
+        return notes
+      }
+    } catch (error) {
+      console.log(error)
+    }
+    console.log("reached hrere")
+    const localNotes = await this.DB?.getAllAsync("SELECT * FROM NoteTaking")
+    return localNotes
   }
 
 
@@ -92,20 +101,31 @@ class NotesTakingManager {
 
   }
 
+
+  // TODO 
+  //  - check if remote server is  up and running
+  //   - check if net is available 
+  //    - shol't not fail if remote server is not running or if net is not connected it must return flags to endicate weather to sotre in lcoa or remote 
+  //
   async isRemoteUpAndRunning() {
+    const BASEURL = "https://6a0c8d2f5aa893e1015c0f4d.mockapi.io"
+    if (!this.isConnected) {
+      this.isConnected = false
+      return { res: { "isConnected": false }, baseUrl: BASEURL }
+    }
     try {
-      // check if remote server are up and running 
-      // const BASEURL = "http://localhost:3001"
-      const BASEURL = "https://6a0c8d2f5aa893e1015c0f4d.mockapi.io"
       const res = await axios.get(BASEURL)
-      console.log(res.status)
       return { res: res.status == 200 ? { "isConnected": true } : { "isConnected": false }, baseUrl: BASEURL }
     } catch (error) {
+      this.isConnected = false
       console.log("failed chihng if remote server is up and running", error)
+    } finally {
+      console.log("finally flags updated")
     }
   }
 
   async SyncDataWithoutConflict(Note?: Note) {
+    console.log("reached herer syncing....")
     const baseUrl = (await this.isRemoteUpAndRunning())?.baseUrl
     try {
       const AllLocalData = await this.DB?.getAllAsync(`SELECT * FROM NoteTaking`)
@@ -125,6 +145,8 @@ class NotesTakingManager {
           Alert.alert("Success", "loca files are sync to remove frutfully")
         }
       }
+
+      console.log("sync completed....")
     } catch (error) {
       console.log(error)
     }
@@ -154,35 +176,26 @@ class NotesTakingManager {
     }
 
     try {
-      console.log(this.isConnected, (await this.isRemoteUpAndRunning())?.res.isConnected)
-
-
       if (!this.isConnected || (await this.isRemoteUpAndRunning())?.res.isConnected == false) {
         const res = await this.DB?.runAsync(`INSERT INTO NoteTaking(note, title, tag1, tag2) VALUES(?, ?, ?, ?) `, [Note.note, Note.title, Note.tag1, Note.tag2])
         console.log(res)
+        console.log("reached here")
         this.isSyncAvilable = "yes"
         Alert.alert("Success", "note is uploaded in local fils")
-        console.log("Success", "note is uploaded in local fils")
         return
       }
 
+      if (this.isSyncAvilable == "yes" && (await this.isRemoteUpAndRunning())?.res.isConnected == true) {
+        await this.SyncDataWithoutConflict(Note)
+        this.isSyncAvilable = "no"
+      }
 
-      if (this.isSyncAvilable == "yes" && (await this.isRemoteUpAndRunning())?.res.isConnected) {
+      if ((await this.isRemoteUpAndRunning())?.res.isConnected) {
         const baseUrl = (await this.isRemoteUpAndRunning())?.baseUrl
-
-        console.log("uploading to reote .....")
-        console.log(baseUrl)
-        // sync local to remote 
-        // await this.SyncDataWithoutConflict(Note)
-        // upload current note to remote 
-        console.log("note data man", Note)
         const res = await axios.post(`${baseUrl}/notes`, Note);
-
-        if (res.status != 200) {
+        if (res.status >= 500 || res.status == 400) {
           Alert.alert("Failed", "Failed to upload current note to remote db")
         }
-        // at the end upload the current note
-        this.isSyncAvilable = "no"
         Alert.alert("Success", "note uploaded to remote server.")
       }
 
