@@ -13,11 +13,10 @@ const AuthenticateWithBiometrix = async () => {
         Alert.alert('Welcome Back!', `Logged in as user`);
         AsyncStorage.setItem("userLoggedIn", "true")
         router.replace("/(tabs)");
-
       }
     } catch (error) {
       Alert.alert('biometrix failed to Authenticate');
-      AsyncStorage.setItem("userLoggedIn", "true")
+      AsyncStorage.setItem("userLoggedIn", "false")
       console.error('Biometric authentication error:', error);
     }
   }

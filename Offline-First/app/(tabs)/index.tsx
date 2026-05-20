@@ -1,16 +1,26 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, TextInput, Pressable, ScrollView } from 'react-native';
 import { BlurView } from 'expo-blur';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import AddNoteModal from '@/components/AddNoteModal';
 import { ManageNonte } from '@/hooks/AddNotes';
-
+import { type Note } from "../../hooks/AddNotes.js"
 export default function TabOneScreen() {
   const [isModalOpen, setIsModalOpen] = useState(false)
-  // ManageNonte.CheckNetworkStablity() /// here this function should check for network connectivity 
-  // ManageNonte.SyncDataWithoutConflict() /// here this function should check for network connectivity 
-  // ManageNonte.GetAllNote()
+  const [notes, setNotes] = useState<Array<Note>>([])
+
+
+  useEffect(() => {
+    const FetchAllNotes = async () => {
+      const AllNotes = await ManageNonte.GetAllNote()
+      console.log(AllNotes)
+      setNotes(AllNotes == undefined ? [] : AllNotes)
+      console.log("all notes ", AllNotes)
+    }
+    FetchAllNotes()
+  }, [])
+
 
 
   return (
@@ -45,8 +55,8 @@ export default function TabOneScreen() {
           </View>
 
           {/* Note Card Component */}
-          {[1, 2, 3, 4, 5].map((item) => (
-            <View key={item} className="mb-5 rounded-3xl overflow-hidden border border-[#2e2e2e]">
+          {notes.length > 0 ? notes.map((item, idx) => (
+            <View key={idx} className="mb-5 rounded-3xl overflow-hidden border border-[#2e2e2e]">
               <BlurView
                 intensity={90}
                 tint="dark"
@@ -57,29 +67,31 @@ export default function TabOneScreen() {
                   <View className="flex-row items-center justify-between mb-3">
                     <View className="flex-row items-center">
                       <Ionicons name="pin" size={18} color="#8c8aff" />
-                      <Text className="text-white text-lg font-semibold ml-2">Authentication Protocols</Text>
+                      <Text className="text-white text-lg font-semibold ml-2">{item.title}</Text>
                     </View>
                     <Ionicons name="ellipsis-vertical" color="#a1a1a1" size={20} />
                   </View>
 
                   {/* Card Body */}
                   <Text className="text-zinc-400 text-sm leading-5 mb-4">
-                    Review the multi-factor authentication handshake logic for the new biometric integration. Ensure the seed generation...
+                    {item.note}
                   </Text>
 
                   {/* Card Footer / Tags */}
                   <View className="flex-row gap-2">
                     <View className="bg-[#322e4d] px-3 py-1 rounded-lg">
-                      <Text className="text-[#8c8aff] text-[10px] font-bold uppercase">Security</Text>
+                      <Text className="text-[#8c8aff] text-[10px] font-bold uppercase">{item.tag1}</Text>
                     </View>
                     <View className="bg-[#242424] px-3 py-1 rounded-lg">
-                      <Text className="text-zinc-500 text-[10px] font-bold uppercase">Updated 2h ago</Text>
+                      <Text className="text-zinc-500 text-[10px] font-bold uppercase">{item.tag2}</Text>
                     </View>
                   </View>
                 </View>
               </BlurView>
             </View>
-          ))}
+          )) :
+            <Text className='text-3xl text-white text-center mt-10'> you don't have any notes</Text>
+          }
 
         </ScrollView>
       </SafeAreaView>
