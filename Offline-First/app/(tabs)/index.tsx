@@ -6,9 +6,13 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import AddNoteModal from '@/components/AddNoteModal';
 import { ManageNonte } from '@/hooks/AddNotes';
 import { type Note } from "../../hooks/AddNotes.js"
+import NoteActionMenu from "@/components/Dropdown";
 export default function TabOneScreen() {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [notes, setNotes] = useState<Array<Note>>([])
+  const [language, setLanguage] = useState('java');
+
+
 
 
   useEffect(() => {
@@ -44,6 +48,7 @@ export default function TabOneScreen() {
               className="flex-1 ml-3 text-white text-base"
             />
             <Ionicons name="options-outline" size={20} color="#8995fd" />
+
           </View>
 
           {/* Header Section */}
@@ -70,6 +75,7 @@ export default function TabOneScreen() {
                       <Text className="text-white text-lg font-semibold ml-2">{item.title}</Text>
                     </View>
                     <Ionicons name="ellipsis-vertical" color="#a1a1a1" size={20} />
+
                   </View>
 
                   {/* Card Body */}
@@ -99,7 +105,7 @@ export default function TabOneScreen() {
       {
         isModalOpen ? <AddNoteModal setIsModalOpen={setIsModalOpen} /> : ""
       }
-
+      <NoteActionMenu />
       {/* Floating Action Button */}
       <View className="absolute bottom-10 right-8">
         <Pressable

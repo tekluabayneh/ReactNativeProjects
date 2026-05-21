@@ -1,18 +1,8 @@
-// idea 
-// note addng class whrer user can edit with ull CRUD opration 
-// so we also need offline SqlLite  storage and when net is stable we have to upload notes 
-// so if net is not stable we have to store them to local SqlLite storage 
-// first try to upload if not store them in local storage 
-//
-// i need class of NotesTakingManager 
-// within the class i need add remove update delte 
-// when user add or do CRUD opration we have to first check if net is stable if so upload direcly to remote otherwise in local 
-
-// import NetInfo from "@react-native-community/netinfo";
 import { fetch } from "@react-native-community/netinfo";
 import * as SQLite from 'expo-sqlite';
 import { Alert } from "react-native";
 import axios from "axios"
+
 
 
 export interface Note {
@@ -45,7 +35,7 @@ class NotesTakingManager {
     this.isSyncAvilable = isSyncAvilable || "yes"
     this.id = id
     this.Reason = Reason || {}
-    // this.InitizeDB()
+    this.InitizeDB()
     this.CheckNetworkStablity()
   }
 
@@ -83,7 +73,6 @@ class NotesTakingManager {
     } catch (error) {
       console.log(error)
     }
-    console.log("reached hrere")
     const localNotes = await this.DB?.getAllAsync("SELECT * FROM NoteTaking")
     return localNotes
   }
@@ -178,8 +167,8 @@ class NotesTakingManager {
     try {
       if (!this.isConnected || (await this.isRemoteUpAndRunning())?.res.isConnected == false) {
         const res = await this.DB?.runAsync(`INSERT INTO NoteTaking(note, title, tag1, tag2) VALUES(?, ?, ?, ?) `, [Note.note, Note.title, Note.tag1, Note.tag2])
-        console.log(res)
-        console.log("reached here")
+        console.log("response of local store", res)
+        console.log("uploading to loacla....")
         this.isSyncAvilable = "yes"
         Alert.alert("Success", "note is uploaded in local fils")
         return
@@ -209,11 +198,33 @@ class NotesTakingManager {
   }
 
 
-  UpdateNote(id: number, NoteData: Omit<Note, "tag1" | "tag2">): string {
-    // first always check if data need to be sync 
-    /// again here check if remote server are reachable if so update from there and also from lcoal storage  to free from conflict/override 
 
-    return "update note id 2"
+
+  // first alway check if we have local files we need to sync if so sync them
+  // and then update the note for remote server
+
+
+  // if the device is offline update note from local  
+  async UpdateNote(id: number, NoteData: Omit<Note, "tag1" | "tag2">) {
+    if (!id || NoteData) {
+      Alert.alert("Warning", "to update note you have to have update version of note")
+      return
+    }
+    const baseUrl = (await this.isRemoteUpAndRunning())?.baseUrl
+
+    try {
+      if (this.isConnected && (await this.isRemoteUpAndRunning())?.res.isConnected) {
+        this.SyncDataWithoutConflict()
+      }
+
+      const res = await axios.post(`${baseUrl}` + "/notes", [id, NoteData])
+      console.log(res.data)
+    } catch (error) {
+      console.log(error)
+    }
+
+    const res = await this.DB?.runAsync(`UPDATE NoteTaking set note = ?, title = ?, WHERE id = ?`, [NoteData.note, NoteData.title, id])
+    console.log(res)
   }
 
   DeleteNote(id: number): string {
