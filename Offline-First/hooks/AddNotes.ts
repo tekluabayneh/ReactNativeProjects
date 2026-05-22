@@ -77,7 +77,10 @@ class NotesTakingManager {
     return localNotes
   }
 
+  async GetSingleNoteByTitleName(value: string) {
 
+    return ""
+  }
   async CheckNetworkStablity(): Promise<void> {
     try {
       fetch().then(state => {
@@ -89,7 +92,6 @@ class NotesTakingManager {
     }
 
   }
-
 
   // TODO 
   //  - check if remote server is  up and running
@@ -123,19 +125,17 @@ class NotesTakingManager {
           console.log("notes man", note)
           // sync local files form local to remote 
           const res = await axios.post(`${baseUrl}/notes`, note);
-          console.log("hrere,", res)
-          if (res.status != 200) {
-            // if fail just upload the current note to local and return 
-            const res = await this.DB?.runAsync(`INSERT INTO NoteTaking(note, title, tag1, tag2) VALUES(?, ?, ?, ?) `, [Note?.note, Note?.title, Note?.tag1, Note?.tag2])
-            console.log(res)
+          if (res.status >= 500 || res.status in [400, 404, 401]) {
             Alert.alert("Fail", "failed syncing files")
             break
           }
-          Alert.alert("Success", "loca files are sync to remove frutfully")
+          console.log("sync completed....")
         }
       }
 
-      console.log("sync completed....")
+      console.log("delteting local fiels...")
+      await this.DB?.runAsync("DELETE FROM NoteTaking");
+      Alert.alert("Success", "loca files are sync to remove frutfully")
     } catch (error) {
       console.log(error)
     }
@@ -204,6 +204,7 @@ class NotesTakingManager {
   // and then update the note for remote server
 
 
+
   // if the device is offline update note from local  
   async UpdateNote(id: number, NoteData: Omit<Note, "tag1" | "tag2">) {
     if (!id || NoteData) {
@@ -223,18 +224,31 @@ class NotesTakingManager {
       console.log(error)
     }
 
-    const res = await this.DB?.runAsync(`UPDATE NoteTaking set note = ?, title = ?, WHERE id = ?`, [NoteData.note, NoteData.title, id])
+
+    const res = await this.DB?.runAsync(`UPDATE NoteTaking SET note = ?, title = ? WHERE id = ?`, [NoteData.note, NoteData.title, id]);
     console.log(res)
   }
 
-  DeleteNote(id: number): string {
+  async DeleteNote(id: number) {
+    if (!id) {
+      Alert.alert("Warning", "to delte specify note id is required")
+      return
+    }
+    const baseUrl = (await this.isRemoteUpAndRunning())?.baseUrl
 
-    // first always check if data need to be sync 
-    /// again here check if remote server are recahble if so update from there and also from lcoal storage  to free from conflict/overide 
-    return "delte note id 1"
+    try {
+      if (this.isConnected && (await this.isRemoteUpAndRunning())?.res.isConnected) {
+        this.SyncDataWithoutConflict()
+      }
+
+      const res = await axios.delete(`${baseUrl} + "/notes:${id}"`)
+      console.log(res.data)
+    } catch (error) {
+      console.log(error)
+    }
   }
 }
 
-
+// @ts-ignore
 export const ManageNonte = new NotesTakingManager()
 
