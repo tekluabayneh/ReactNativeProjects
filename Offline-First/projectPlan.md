@@ -33,11 +33,11 @@ Why it's advanced: You'll learn how to manage NetInfo and how to architect a dat
   ## core feture to taken care of
 
 - must have fetures
-  - Offline-First
+  - Offline-First // done
   - Debouncing Search
   - Glassmorphism UI // done
   - auth with FaceID/Fingerprint // done
-  - sync data when network comes/stable
+  - sync data when network comes/stable / done
 
 - optional fetures
   - Conflict Resolution
