@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TextInput, Pressable, ScrollView } from 'react-native';
+import { View, Text, TextInput, Pressable, ScrollView, TouchableOpacity, TextInputChangeEvent } from 'react-native';
 import { BlurView } from 'expo-blur';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Ionicons from '@expo/vector-icons/Ionicons';
@@ -7,20 +7,32 @@ import AddNoteModal from '@/components/AddNoteModal';
 import { ManageNonte } from '@/hooks/AddNotes';
 import { type Note } from "../../hooks/AddNotes.js"
 import NoteActionMenu from "@/components/Dropdown";
+import { UseDebounce } from '@/hooks/SearchNote';
+
+
 export default function TabOneScreen() {
+  const [DropDownIsModalOpen, setDropDownIsModalOpen] = useState(false)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [notes, setNotes] = useState<Array<Note>>([])
-  const [language, setLanguage] = useState('java');
+  const [ActiveItem, SetActiveItem] = useState(0);
+  const [value, setValue] = useState("")
+  const debounceSearch = UseDebounce(value, 500)
 
+  useEffect(() => {
+    if (debounceSearch) {
+      console.log("serching for....", debounceSearch)
+      ManageNonte.GetSingleNoteByTitleName(debounceSearch)
+    }
+  }, [debounceSearch])
 
-
+  const SetItemActive = (id: number) => {
+    SetActiveItem(id)
+  }
 
   useEffect(() => {
     const FetchAllNotes = async () => {
       const AllNotes = await ManageNonte.GetAllNote()
-      console.log(AllNotes)
       setNotes(AllNotes == undefined ? [] : AllNotes)
-      console.log("all notes ", AllNotes)
     }
     FetchAllNotes()
   }, [])
@@ -43,6 +55,8 @@ export default function TabOneScreen() {
           <View className="flex-row items-center bg-[#1f1f1f] border border-[#2e2e2e] rounded-2xl px-4 py-3 mb-6">
             <Ionicons name="search" size={20} color="#a1a1a1" />
             <TextInput
+              value={value}
+              onChangeText={(val) => setValue(val)}
               placeholder="Search your vault..."
               placeholderTextColor="#737373"
               className="flex-1 ml-3 text-white text-base"
@@ -61,7 +75,7 @@ export default function TabOneScreen() {
 
           {/* Note Card Component */}
           {notes.length > 0 ? notes.map((item, idx) => (
-            <View key={idx} className="mb-5 rounded-3xl overflow-hidden border border-[#2e2e2e]">
+            <View key={idx} className="mb-5 rounded-3xl border border-[#2e2e2e]">
               <BlurView
                 intensity={90}
                 tint="dark"
@@ -74,8 +88,18 @@ export default function TabOneScreen() {
                       <Ionicons name="pin" size={18} color="#8c8aff" />
                       <Text className="text-white text-lg font-semibold ml-2">{item.title}</Text>
                     </View>
-                    <Ionicons name="ellipsis-vertical" color="#a1a1a1" size={20} />
-
+                    <TouchableOpacity
+                      onPress={() => {
+                        setDropDownIsModalOpen((val) => !val)
+                        SetItemActive(idx)
+                      }}
+                    >
+                      <Ionicons
+                        name="ellipsis-vertical" color="#a1a1a1" size={20} />
+                    </TouchableOpacity>
+                    {DropDownIsModalOpen && ActiveItem == idx ? (
+                      <NoteActionMenu setDropDownIsModalOpen={setDropDownIsModalOpen} />
+                    ) : ""}
                   </View>
 
                   {/* Card Body */}
@@ -94,7 +118,9 @@ export default function TabOneScreen() {
                   </View>
                 </View>
               </BlurView>
+
             </View>
+
           )) :
             <Text className='text-3xl text-white text-center mt-10'> you don't have any notes</Text>
           }
@@ -105,7 +131,7 @@ export default function TabOneScreen() {
       {
         isModalOpen ? <AddNoteModal setIsModalOpen={setIsModalOpen} /> : ""
       }
-      <NoteActionMenu />
+
       {/* Floating Action Button */}
       <View className="absolute bottom-10 right-8">
         <Pressable
