@@ -27,7 +27,7 @@ const MusicList =
     }
   ]
 
-export const RecentlyPlayedMusics = (props: {}) => {
+export const RecentlyPlayedMusics = () => {
   return (
 
     <View className="w-full">
