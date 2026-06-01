@@ -79,6 +79,7 @@ export const RecentlyPlayedMusics = () => {
         numColumns={2}
         columnWrapperClassName="justify-between"
         contentContainerClassName="px-4 pb-4 gap-3"
+
         ListHeaderComponent={
           <View className="flex-row items-center justify-between mb-1 pt-1">
             <Text className="text-white text-[17px] font-extrabold tracking-tight">
