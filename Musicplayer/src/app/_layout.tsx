@@ -1,5 +1,5 @@
 import { DarkTheme, DefaultTheme, ThemeProvider } from 'expo-router';
-import { useColorScheme } from 'react-native';
+import { Platform, StyleSheet, useColorScheme, View } from 'react-native';
 import { NativeTabs } from 'expo-router/unstable-native-tabs';
 import { Colors } from '@/constants/theme';
 import { AnimatedSplashOverlay } from '@/components/animated-icon';
@@ -11,6 +11,7 @@ export default function TabLayout() {
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <AnimatedSplashOverlay />
+
       <NativeTabs
         backgroundColor={colors.background}
         indicatorColor={colors.backgroundElement}
@@ -23,6 +24,16 @@ export default function TabLayout() {
           />
         </NativeTabs.Trigger>
 
+        <NativeTabs.Trigger name="(current)">
+          <NativeTabs.Trigger.Label>Artists</NativeTabs.Trigger.Label>
+          <NativeTabs.Trigger.Icon
+            src={require('@/assets/images/tabIcons/explore.png')}
+            renderingMode="template"
+          />
+        </NativeTabs.Trigger>
+
+
+
         <NativeTabs.Trigger name="(artists)">
           <NativeTabs.Trigger.Label>Artists</NativeTabs.Trigger.Label>
           <NativeTabs.Trigger.Icon
@@ -30,7 +41,9 @@ export default function TabLayout() {
             renderingMode="template"
           />
         </NativeTabs.Trigger>
+
       </NativeTabs>
     </ThemeProvider>
   );
 }
+
