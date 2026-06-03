@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { View, Text, FlatList, Image, TouchableOpacity, StatusBar } from 'react-native';
 import axios from 'axios';
 import { MoreHorizontal } from 'lucide-react-native';
+import { Link } from 'expo-router';
 
 const formatDuration = (seconds) => {
   const m = Math.floor(seconds / 60);
@@ -19,13 +20,15 @@ const MusicPlayList = ({ item, index }) => {
       <Text className='w-6 text-white/25 text-xs font-semibold text-center mr-3'>
         {String(index + 1).padStart(2, '0')}
       </Text>
-
-      {/* Album Art */}
-      <Image
-        source={{ uri: item.artist.picture_small }}
+      <Link href="/(current)"
         className='w-13 h-13 rounded-xl mr-4'
-      />
-
+      >
+        {/* Album Art */}
+        <Image
+          source={{ uri: item.artist.picture_small }}
+          className='w-13 h-13 rounded-xl mr-4'
+        />
+      </Link>
       {/* Song Info */}
       <View className='flex-1 mr-3'>
         <Text numberOfLines={1} className='text-white text-[15px] font-semibold tracking-wide mb-1'>
@@ -44,6 +47,7 @@ const MusicPlayList = ({ item, index }) => {
         <MoreHorizontal color="#fff" size={20} />
       </View>
     </TouchableOpacity>
+
   );
 };
 
@@ -103,5 +107,6 @@ export default function ArtistsList() {
         />
       )}
     </View>
+
   );
 }
