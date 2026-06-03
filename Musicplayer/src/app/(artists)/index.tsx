@@ -1,6 +1,4 @@
-// app/(artists)/index.tsx
-import { Pause, Play, Verified } from "lucide-react-native";
-import { ImageBackground, Text, TouchableOpacity, View } from "react-native";
+import { View } from "react-native";
 import { NavigationBar } from "@/components/ui/NavigationBar";
 import ArtistVewingPlayScreen from "@/components/ui/CurrentlyVewingArtists";
 import ArtistsList from "@/components/ui/ArsistList";
@@ -12,7 +10,7 @@ export default function ArtistScreen({ pause, setPause }) {
     <>
       <View className="flex-1 mt-6">
         <NavigationBar />
-        <ArtistVewingPlayScreen />
+        <ArtistVewingPlayScreen pause={pause} setPause={setPause} />
         <ArtistsList />
       </View>
     </>
