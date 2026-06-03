@@ -1,6 +1,8 @@
-import { Text, TouchableOpacity, View } from "react-native";
+import { Pressable, Text, TouchableOpacity, View } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { ChevronDown, MoreHorizontal, Music2, Music4, Pause, Play, Shuffle, SkipBack, SkipForward, SlidersHorizontal, MonitorSmartphone } from "lucide-react-native";
+import { Link, router } from "expo-router";
+
 export default function ArtistScreen({ pause, setPause }) {
   return (
     <>
@@ -15,7 +17,9 @@ export default function ArtistScreen({ pause, setPause }) {
             <View className="w-full flex-row items-center justify-between p-2">
 
               <View className="w-16 h-16 flex items-center justify-center rounded-full bg-white/10 border border-white/10">
-                <ChevronDown size={24} color="#fff" />
+                <Pressable onPress={() => router.back()}>
+                  <ChevronDown size={24} color="#fff" />
+                </Pressable>
               </View>
 
               <View className="flex items-center justify-between mt-3">
@@ -98,7 +102,7 @@ export default function ArtistScreen({ pause, setPause }) {
 
 
 
-            <View className="flex-row items-center justify-between mx-3  shrink-0 mt-20">
+            <View className="flex-row items-center justify-between mx-3  shrink-0 mt-8">
               <View className="flex items-center">
                 <TouchableOpacity
                   className="w-[50px] h-[50px] rounded-full bg-white/[0.06] items-center justify-center"
