@@ -1,9 +1,10 @@
 import { Pause, Play, Heart, MoreHorizontal } from "lucide-react-native";
-import { ImageBackground, Text, TouchableOpacity, View, Animated, Easing } from "react-native";
+import { ImageBackground, Text, TouchableOpacity, View, Animated, Easing, Platform } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { useEffect, useRef } from "react";
-
+import { useMusic } from "../context/Music";
 function WaveBar({ delay }) {
+
   const anim = useRef(new Animated.Value(0.3)).current;
 
   useEffect(() => {
@@ -39,7 +40,9 @@ function WaveBar({ delay }) {
   );
 }
 
-export default function ArtistViewingPlayScreen({ pause, setPause }) {
+export default function ArtistViewingPlayScreen() {
+
+  const { isPlaying, PlayMusic, PauseMusic } = useMusic()
   const BARS = 32;
 
   return (
@@ -116,7 +119,7 @@ export default function ArtistViewingPlayScreen({ pause, setPause }) {
             alignItems: "center",
             justifyContent: "center",
             gap: 2,
-            opacity: pause ? 0.35 : 0.7,
+            opacity: isPlaying ? 0.35 : 0.7,
           }}
         >
           {Array.from({ length: BARS }).map((_, i) => (
@@ -152,7 +155,7 @@ export default function ArtistViewingPlayScreen({ pause, setPause }) {
           <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
             {/* Play/Pause */}
             <TouchableOpacity
-              onPress={() => setPause(!pause)}
+              onPress={() => PauseMusic()}
               style={{
                 width: 52,
                 height: 52,
@@ -162,7 +165,7 @@ export default function ArtistViewingPlayScreen({ pause, setPause }) {
                 justifyContent: "center",
               }}
             >
-              {pause ? (
+              {isPlaying ? (
                 <Play color="#000" size={20} fill="#000" />
               ) : (
                 <Pause color="#000" size={20} fill="#000" />
