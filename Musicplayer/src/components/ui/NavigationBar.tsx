@@ -1,6 +1,6 @@
 import { Text, View, TouchableOpacity } from "react-native"
 import { Search, Menu } from 'lucide-react-native';
-import { Image } from "expo-image";
+
 
 export const NavigationBar = () => {
   return (
