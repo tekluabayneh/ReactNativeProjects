@@ -3,6 +3,7 @@ import { Platform, StyleSheet, useColorScheme, View } from 'react-native';
 import { NativeTabs } from 'expo-router/unstable-native-tabs';
 import { Colors } from '@/constants/theme';
 import { AnimatedSplashOverlay } from '@/components/animated-icon';
+import { MusicProvider } from '@/components/context/Music';
 
 export default function TabLayout() {
   const scheme = useColorScheme();
@@ -11,39 +12,39 @@ export default function TabLayout() {
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <AnimatedSplashOverlay />
+      <MusicProvider>
+        <NativeTabs
+          backgroundColor={colors.background}
+          indicatorColor={colors.backgroundElement}
+          labelStyle={{ selected: { color: colors.text } }}>
+          <NativeTabs.Trigger name="index">
+            <NativeTabs.Trigger.Label>Home</NativeTabs.Trigger.Label>
+            <NativeTabs.Trigger.Icon
+              src={require('@/assets/images/tabIcons/home.png')}
+              renderingMode="template"
+            />
+          </NativeTabs.Trigger>
 
-      <NativeTabs
-        backgroundColor={colors.background}
-        indicatorColor={colors.backgroundElement}
-        labelStyle={{ selected: { color: colors.text } }}>
-        <NativeTabs.Trigger name="index">
-          <NativeTabs.Trigger.Label>Home</NativeTabs.Trigger.Label>
-          <NativeTabs.Trigger.Icon
-            src={require('@/assets/images/tabIcons/home.png')}
-            renderingMode="template"
-          />
-        </NativeTabs.Trigger>
-
-        <NativeTabs.Trigger name="(current)">
-          <NativeTabs.Trigger.Label>Artists</NativeTabs.Trigger.Label>
-          <NativeTabs.Trigger.Icon
-            src={require('@/assets/images/tabIcons/explore.png')}
-            renderingMode="template"
-          />
-        </NativeTabs.Trigger>
+          <NativeTabs.Trigger name="(current)" >
+            <NativeTabs.Trigger.Label>Artists</NativeTabs.Trigger.Label>
+            <NativeTabs.Trigger.Icon
+              src={require('@/assets/images/tabIcons/explore.png')}
+              renderingMode="template"
+            />
+          </NativeTabs.Trigger>
 
 
 
-        <NativeTabs.Trigger name="(artists)">
-          <NativeTabs.Trigger.Label>Artists</NativeTabs.Trigger.Label>
-          <NativeTabs.Trigger.Icon
-            src={require('@/assets/images/tabIcons/explore.png')}
-            renderingMode="template"
-          />
-        </NativeTabs.Trigger>
-
-      </NativeTabs>
-    </ThemeProvider>
+          <NativeTabs.Trigger name="(artists)">
+            <NativeTabs.Trigger.Label>Artists</NativeTabs.Trigger.Label>
+            <NativeTabs.Trigger.Icon
+              src={require('@/assets/images/tabIcons/explore.png')}
+              renderingMode="template"
+            />
+          </NativeTabs.Trigger>
+        </NativeTabs>
+      </MusicProvider>
+    </ThemeProvider >
   );
 }
 
