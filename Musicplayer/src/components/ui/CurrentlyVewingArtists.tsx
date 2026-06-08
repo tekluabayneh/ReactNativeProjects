@@ -41,12 +41,12 @@ function WaveBar({ delay }) {
 }
 
 export default function ArtistViewingPlayScreen() {
-
   const { isPlaying, PlayMusic, PauseMusic } = useMusic()
   const BARS = 32;
 
   return (
     <View style={{ width: "100%", height: 480, borderRadius: 20, overflow: "hidden" }}>
+
       <ImageBackground
         style={{ width: "100%", height: "100%", justifyContent: "flex-end" }}
         source={{
@@ -221,6 +221,7 @@ export default function ArtistViewingPlayScreen() {
             </TouchableOpacity>
           </View>
         </View>
+
       </ImageBackground>
     </View>
   );

@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react';
-import { View, Text, FlatList, Image, TouchableOpacity, StatusBar } from 'react-native';
-import axios from 'axios';
-import { MoreHorizontal } from 'lucide-react-native';
+import { View, Text, FlatList, Image, TouchableOpacity, StatusBar, Pressable, Alert } from 'react-native';
+import { CloudSnow, MoreHorizontal } from 'lucide-react-native';
 import { Link } from 'expo-router';
+import { useMusic } from '../context/Music';
+
+
 
 const formatDuration = (seconds) => {
   const m = Math.floor(seconds / 60);
@@ -11,24 +12,30 @@ const formatDuration = (seconds) => {
 };
 
 const MusicPlayList = ({ item, index }) => {
+  const { setShowPlayer, PlayMusic, shooseMusicToPlay } = useMusic()
   return (
     <TouchableOpacity
       activeOpacity={0.7}
       className='flex-row items-center mx-4 my-1 px-4 py-3 rounded-2xl bg-white/5 border border-white/[0.07]'
+
     >
       {/* Track Number */}
       <Text className='w-6 text-white/25 text-xs font-semibold text-center mr-3'>
         {String(index + 1).padStart(2, '0')}
       </Text>
-      <Link href="/(current)"
-        className='w-13 h-13 rounded-xl mr-4'
+      <TouchableOpacity onPress={() => {
+        setShowPlayer()
+        shooseMusicToPlay(index)
+      }
+      }
       >
         {/* Album Art */}
         <Image
-          source={{ uri: item.artist.picture_small }}
+          source={{ uri: item.artwork }}
           className='w-13 h-13 rounded-xl mr-4'
         />
-      </Link>
+
+      </TouchableOpacity>
       {/* Song Info */}
       <View className='flex-1 mr-3'>
         <Text numberOfLines={1} className='text-white text-[15px] font-semibold tracking-wide mb-1'>
@@ -71,33 +78,17 @@ const ListHeader = () => (
 );
 
 export default function ArtistsList() {
-  const [songs, setSongs] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchSongs = async () => {
-      try {
-        const res = await axios.get('https://api.deezer.com/search?q=eminem');
-        setSongs(res.data.data);
-      } catch (error) {
-        console.log('Fetch error:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchSongs();
-  }, []);
-
+  const { Songs, Loading } = useMusic()
   return (
     <View className='flex-1 bg-[#0D0D0F]'>
       <StatusBar barStyle='light-content' />
-      {loading ? (
+      {Loading ? (
         <View className='flex-1 items-center justify-center'>
           <Text className='text-white/30 text-sm'>Loading tracks…</Text>
         </View>
       ) : (
         <FlatList
-          data={songs}
+          data={Songs}
           keyExtractor={(item) => String(item.id)}
           contentContainerClassName='pb-10'
           ListHeaderComponent={<ListHeader />}
