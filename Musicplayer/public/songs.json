@@ -1,0 +1,123 @@
+[
+  {
+    "id": "track_01",
+    "title": "Midnight Drive",
+    "artist": "Neon Horizon",
+    "album": "Synthwave After Hours",
+    "duration": 184,
+    "genre": "Electronic / Synthwave",
+    "artwork": "https://images.unsplash.com/photo-1614680376593-902f74fa0d41?w=400&auto=format&fit=crop&q=80",
+    "local_path": "1.mp3",
+    "isFavorite": false
+  },
+  {
+    "id": "track_02",
+    "title": "Chillhop Coffee",
+    "artist": "Lofi Scholar",
+    "album": "Study Session Vol. 4",
+    "duration": 142,
+    "genre": "Lofi / Hip Hop",
+    "artwork": "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=400&auto=format&fit=crop&q=80",
+    "local_path": "2.mp3",
+    "isFavorite": true
+  },
+  {
+    "id": "track_03",
+    "title": "Urban Renaissance",
+    "artist": "The Spitters",
+    "album": "Concrete Jungle",
+    "duration": 215,
+    "genre": "Underground Hip Hop",
+    "artwork": "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=400&auto=format&fit=crop&q=80",
+    "local_path": "3.mp3",
+    "isFavorite": false
+  },
+  {
+    "id": "track_04",
+    "title": "Echoes of Eternity",
+    "artist": "Aether Void",
+    "album": "Cosmic Whispers",
+    "duration": 310,
+    "genre": "Ambient / Cinematic",
+    "artwork": "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=400&auto=format&fit=crop&q=80",
+    "local_path": "4.mp3",
+    "isFavorite": false
+  },
+  {
+    "id": "track_05",
+    "title": "Sun-Kissed Strings",
+    "artist": "Matteo & The Coastal Trio",
+    "album": "Baleares Escape",
+    "duration": 198,
+    "genre": "Acoustic / Latin Jazz",
+    "artwork": "https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=400&auto=format&fit=crop&q=80",
+    "local_path": "5.mp3",
+    "isFavorite": true
+  },
+  {
+    "id": "track_06",
+    "title": "Static Velocity",
+    "artist": "Code Red",
+    "album": "Cybernetic Drift",
+    "duration": 165,
+    "genre": "Industrial Rock",
+    "artwork": "https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?w=400&auto=format&fit=crop&q=80",
+    "local_path": "6.mp3",
+    "isFavorite": false
+  },
+  {
+    "id": "track_07",
+    "title": "Summer Chills",
+    "artist": "DJ Sol",
+    "album": "Ibiza Warmup 2026",
+    "duration": 240,
+    "genre": "Deep House",
+    "artwork": "https://images.unsplash.com/photo-1498038432885-c6f3f1b912ee?w=400&auto=format&fit=crop&q=80",
+    "local_path": "7.mp3",
+    "isFavorite": false
+  },
+  {
+    "id": "track_08",
+    "title": "Velvet Skylines",
+    "artist": "Amara Jazz Ensemble",
+    "album": "Late Night Blue Note",
+    "duration": 282,
+    "genre": "Smooth Jazz",
+    "artwork": "https://images.unsplash.com/photo-1459749411175-04bf5292ceea?w=400&auto=format&fit=crop&q=80",
+    "local_path": "8.mp3",
+    "isFavorite": false
+  },
+  {
+    "id": "track_09",
+    "title": "Neon Raindrops",
+    "artist": "Glitch Dreamer",
+    "album": "Digital Rainy Days",
+    "duration": 152,
+    "genre": "IDM / Future Bass",
+    "artwork": "https://images.unsplash.com/photo-1516280440614-37939bbacd6a?w=400&auto=format&fit=crop&q=80",
+    "local_path": "9.mp3",
+    "isFavorite": true
+  },
+  {
+    "id": "track_10",
+    "title": "Rooted Echo",
+    "artist": "Ancestral Vibe",
+    "album": "Origins EP",
+    "duration": 225,
+    "genre": "Afrobeat / Tribal Loop",
+    "artwork": "https://images.unsplash.com/photo-1501386761578-eac5c94b800a?w=400&auto=format&fit=crop&q=80",
+    "local_path": "10.mp3",
+    "isFavorite": false
+  },
+  {
+    "id": "track_11",
+    "title": "Shattered Silence",
+    "artist": "The Distortion Project",
+    "album": "Feedback Therapy",
+    "duration": 178,
+    "genre": "Alternative Rock",
+    "artwork": "https://images.unsplash.com/photo-1487180142328-0c4e37023af5?w=400&auto=format&fit=crop&q=80",
+    "local_path": "11.mp3",
+    "isFavorite": false
+  }
+]
